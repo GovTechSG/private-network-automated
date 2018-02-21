@@ -3,8 +3,6 @@
 ## Software Pre-requisites
 
 1. [Terraform](https://www.terraform.io/)
-1. [Ansible](https://docs.ansible.com/ansible/latest/intro_installation.html)
-1. [Packer](https://www.packer.io/)
 1. [AWS CLI](https://aws.amazon.com/cli/)
 
 ## AWS Pre-requisite
