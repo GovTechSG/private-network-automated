@@ -116,3 +116,36 @@ resource "aws_security_group_rule" "ethereum_udp" {
 
     security_group_id = "${aws_security_group.nodes.id}"
 }
+
+#######################################################
+# Inventory Generation
+#######################################################
+data "template_file" "inventory_public" {
+  template = "${file("${path.module}/templates/inventory")}"
+
+  vars {
+    master_ip = "${aws_instance.master.public_ip}"
+    validators_ip = "${join("\n", aws_instance.validators.*.public_ip)}"
+    observers_ip = "${join("\n", aws_instance.observers.*.public_ip)}"
+  }
+}
+
+resource "local_file" "inventory_public" {
+    content     = "${data.template_file.inventory_public.rendered}"
+    filename = "${path.module}/inventory-public"
+}
+
+data "template_file" "inventory_private" {
+  template = "${file("${path.module}/templates/inventory")}"
+
+  vars {
+    master_ip = "${aws_instance.master.private_ip}"
+    validators_ip = "${join("\n", aws_instance.validators.*.private_ip)}"
+    observers_ip = "${join("\n", aws_instance.observers.*.private_ip)}"
+  }
+}
+
+resource "local_file" "inventory_private" {
+    content     = "${data.template_file.inventory_private.rendered}"
+    filename = "${path.module}/inventory-private"
+}

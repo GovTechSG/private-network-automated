@@ -19,6 +19,9 @@ and configured.
 - TCP Ethereum Ports: 8180, 8545, 8546, 30303
 - UDP Ethereum Ports: 30303
 
+Your machines should also be running Ubuntu. If you would like to use other OSes instead, you will
+have to modify the setup scripts accordingly.
+
 ### Vagrant
 
 This example shows you how to setup a cluster of Virtualbox VMs on your computer using

@@ -55,3 +55,9 @@ Once everything looks good, apply the configuration with Terraform:
 ```bash
 terraform apply --var-file vars.tfvars
 ```
+
+### Outputs
+
+The terraform application process will create two Ansible inventory files consisting of the public
+and private IPs of the instances accordingly. You can then use the generated inventory file
+to setup your instances.

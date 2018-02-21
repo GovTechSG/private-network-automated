@@ -1,0 +1,8 @@
+[master]
+${master_ip}
+
+[validators]
+${validators_ip}
+
+[observers]
+${observers_ip}
