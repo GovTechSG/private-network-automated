@@ -28,3 +28,15 @@ work:
 
 - `host_vars`
 - `group_vars`
+
+
+## Executing the playbook
+
+You might want to look into the connection options of `ansible-playbook` to configure your
+connection, for example, to configure a different key.
+
+```bash
+ansible-playbook \
+    -i ../provision/terraform/inventory-private  \
+    site.yml
+```
