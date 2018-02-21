@@ -17,8 +17,8 @@ resource "aws_instance" "master" {
         volume_size = "${var.volume_size}"
     }
 
-    tags = "${merge(var.tags, map("Name", format("%s-master", var.name_prefix)))}"
-    volume_tags = "${merge(var.tags, map("Name", format("%s-master", var.name_prefix)))}"
+    tags = "${merge(var.tags, map("Name", format("%s-master", var.name_prefix), "Role", "master"))}"
+    volume_tags = "${merge(var.tags, map("Name", format("%s-master", var.name_prefix), "Role", "master"))}"
 }
 
 resource "aws_instance" "validators" {
@@ -38,8 +38,8 @@ resource "aws_instance" "validators" {
         volume_size = "${var.volume_size}"
     }
 
-    tags = "${merge(var.tags, map("Name", format("%s-validator-%d", var.name_prefix, count.index)))}"
-    volume_tags = "${merge(var.tags, map("Name", format("%s-validator-%d", var.name_prefix, count.index)))}"
+    tags = "${merge(var.tags, map("Name", format("%s-validator-%d", var.name_prefix, count.index),"Role", "validator"))}"
+    volume_tags = "${merge(var.tags, map("Name", format("%s-validator-%d", var.name_prefix, count.index), "Role", "validator"))}"
 }
 
 resource "aws_instance" "observers" {
@@ -59,8 +59,8 @@ resource "aws_instance" "observers" {
         volume_size = "${var.volume_size}"
     }
 
-    tags = "${merge(var.tags, map("Name", format("%s-observer-%d", var.name_prefix, count.index)))}"
-    volume_tags = "${merge(var.tags, map("Name", format("%s-observer-%d", var.name_prefix, count.index)))}"
+    tags = "${merge(var.tags, map("Name", format("%s-observer-%d", var.name_prefix, count.index), "Role", "observer"))}"
+    volume_tags = "${merge(var.tags, map("Name", format("%s-observer-%d", var.name_prefix, count.index), "Role", "observer"))}"
 }
 
 #######################################################
@@ -81,6 +81,16 @@ resource "aws_security_group" "nodes" {
     vpc_id = "${var.vpc_id}"
 
     tags = "${merge(var.tags, map("Name", format("%s", var.name_prefix)))}"
+}
+
+resource "aws_security_group_rule" "out" {
+    type            = "egress"
+    from_port       = 0
+    to_port         = 65535
+    protocol        = "tcp"
+    cidr_blocks     = ["0.0.0.0/0"]
+
+    security_group_id = "${aws_security_group.nodes.id}"
 }
 
 resource "aws_security_group_rule" "ssh_in" {
@@ -120,13 +130,18 @@ resource "aws_security_group_rule" "ethereum_udp" {
 #######################################################
 # Inventory Generation
 #######################################################
+
 data "template_file" "inventory_public" {
   template = "${file("${path.module}/templates/inventory")}"
 
   vars {
     master_ip = "${aws_instance.master.public_ip}"
-    validators_ip = "${join("\n", aws_instance.validators.*.public_ip)}"
-    observers_ip = "${join("\n", aws_instance.observers.*.public_ip)}"
+    validators = "${join("\n", formatlist("validator-%s ansible_host=%s", aws_instance.validators.*.id, aws_instance.validators.*.public_ip))}"
+    observers = "${join("\n", formatlist("observer-%s ansible_host=%s", aws_instance.observers.*.id, aws_instance.observers.*.public_ip))}"
+    // validators_id = "${join("\n", aws_instance.validators.*.id)}"
+    // validators_ip = "${join("\n", aws_instance.validators.*.public_ip)}"
+    // observers_id = "${join("\n", aws_instance.observers.*.id)}"
+    // observers_ip = "${join("\n", aws_instance.observers.*.public_ip)}"
   }
 }
 
@@ -140,8 +155,9 @@ data "template_file" "inventory_private" {
 
   vars {
     master_ip = "${aws_instance.master.private_ip}"
-    validators_ip = "${join("\n", aws_instance.validators.*.private_ip)}"
-    observers_ip = "${join("\n", aws_instance.observers.*.private_ip)}"
+    validators = "${join("\n", formatlist("validator-%s ansible_host=%s", aws_instance.validators.*.id, aws_instance.validators.*.private_ip))}"
+    observers = "${join("\n", formatlist("observer-%s ansible_host=%s", aws_instance.observers.*.id, aws_instance.observers.*.private_ip))}"
+
   }
 }
 

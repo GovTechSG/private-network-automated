@@ -1,0 +1,9 @@
+---
+- hosts: all
+  tags:
+    - bootstrap
+  vars:
+    docker_version: "18.02.0~ce-0~ubuntu"
+  tasks:
+    - include_role:
+        name: ansible-docker-ubuntu

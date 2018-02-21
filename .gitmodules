@@ -1,0 +1,3 @@
+[submodule "setup/roles/ansible-docker-ubuntu"]
+	path = setup/roles/ansible-docker-ubuntu
+	url = https://github.com/lawliet89/ansible-docker-ubuntu.git

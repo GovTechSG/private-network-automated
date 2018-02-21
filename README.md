@@ -35,3 +35,7 @@ You can use the provided [Terraform](https://www.terraform.io/) module to Terraf
 instances with Docker and Docker Compose installed.
 
 See the [README](provision/terraform/README.md) for more information.
+
+## Setup
+
+See the [README](setup/README.md) for more information.

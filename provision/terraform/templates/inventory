@@ -1,8 +1,7 @@
-[master]
-${master_ip}
+master ansible_host=${master_ip}
 
 [validators]
-${validators_ip}
+${validators}
 
 [observers]
-${observers_ip}
+${observers}
