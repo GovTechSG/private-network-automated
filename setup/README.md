@@ -3,6 +3,7 @@
 ## Software Pre-requisites
 
 - [Ansible](https://docs.ansible.com/ansible/latest/intro_installation.html)
+- [Geth](https://github.com/ethereum/go-ethereum/wiki/geth)
 
 ## Pre-requisites
 
@@ -29,6 +30,12 @@ work:
 - `host_vars`
 - `group_vars`
 
+## Account keys
+
+For the master node and each of the observer nodes, the keys will be generated under the `keys/`
+directory along with the passwords for each key. The passwords and keys _are non recoverable_.
+Make sure you copy them to a safe location after the initial setup. And
+_do not check them into source control_!.
 
 ## Executing the playbook
 

@@ -1,0 +1,45 @@
+---
+- name: Set up paths
+  set_fact:
+    json_path: "{{ path }}/{{ account }}.json"
+    password_path: "{{ path }}/{{ account }}.pwd"
+- name: Check if files exist
+  stat:
+    path: "{{ item }}"
+  with_items:
+    - "{{ json_path }}"
+    - "{{ password_path }}"
+  register: exists
+- name: Refuse to overwrite
+  fail:
+    msg: "{{ item.item }} exists -- not overwriting"
+  when: item.stat.exists and not overwrite
+  with_items: "{{ exists.results }}"
+- name: Generate password
+  shell: "tr -d -c '[:graph:]' < /dev/urandom | head -c 20 > {{ password_path }}"
+- name: Get temporary directory
+  tempfile:
+    state: directory
+  register: temp
+- name: Generate Geth account
+  shell: "geth account new --password {{ password_path }} --keystore {{ temp.path }}"
+- name: Find the path of generated file
+  find:
+    paths: "{{ temp.path }}"
+    patterns: "*"
+    recurse: no
+    file_type: file
+  register: find_result
+- name: Sanity check that only one file is generated
+  fail:
+    msg: "More than one file generated. Possible bug"
+  when: find_result.files | length != 1
+- name: Copy and rename file
+  copy:
+    src: "{{ find_result.files[0].path }}"
+    dest: "{{ json_path }}"
+    mode: 0600
+- name: Delete temporary file
+  file:
+    state: absent
+    path: "{{ find_result.files[0].path }}"

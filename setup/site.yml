@@ -10,5 +10,21 @@
       upgrade: yes
       update_cache: yes
     become: yes
-  - include_role:
+  - name: Install Docker
+    include_role:
       name: ansible-docker-ubuntu
+- hosts:
+    - master
+    - validators
+  tags:
+    - bootstrap
+    - generate_keys
+  vars:
+    overwrite: true
+  tasks:
+  - name: Generate keys
+    include_role:
+      name: geth-key
+    vars:
+      account: "{{ inventory_hostname }}"
+    delegate_to: localhost
