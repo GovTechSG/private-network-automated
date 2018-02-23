@@ -17,6 +17,10 @@
   with_items: "{{ exists.results }}"
 - name: Generate password
   shell: "tr -d -c '[:graph:]' < /dev/urandom | head -c 20 > {{ password_path }}"
+- name: Chmod password file
+  file:
+    mode: 0600
+    path: "{{ password_path }}"
 - name: Get temporary directory
   tempfile:
     state: directory

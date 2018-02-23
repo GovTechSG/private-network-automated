@@ -30,5 +30,4 @@
       name: geth-key
     vars:
       account: "{{ inventory_hostname }}"
-      path: "{{ path }}"
     delegate_to: localhost
