@@ -25,6 +25,30 @@ The example shown will use a local backend which is _not suitable_ for most prod
 might want to consider configuring a different
 [backend](https://www.terraform.io/docs/backends/index.html) for your needs.
 
+For example to use a [S3 backend](https://www.terraform.io/docs/backends/types/s3.html),
+you can drop in a `backend.tf` file (which is Git ignored):
+
+```hcl
+terraform {
+    backend "s3" { }
+}
+```
+
+and then configure it with a `backend-config.tfvars` (which is also Git ignored):
+
+```hcl
+bucket = "terraform"
+key = "parity-poa"
+region = "ap-southeast-1"
+dynamodb_table = "terraform"
+```
+
+Then you can initialise Terraform with
+
+```bash
+terraform init --backend-config backend-config.tfvars
+```
+
 ### Plan with Terraform
 
 We will first need to define the values for some [input variables](https://www.terraform.io/intro/getting-started/variables.html).
