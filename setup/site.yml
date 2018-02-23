@@ -20,11 +20,15 @@
     - bootstrap
     - generate_keys
   vars:
+    # Overwrite exsiting keys or not
     overwrite: true
+    # Path to write keys to
+    path: "{{ playbook_dir }}/keys"
   tasks:
   - name: Generate keys
     include_role:
       name: geth-key
     vars:
       account: "{{ inventory_hostname }}"
+      path: "{{ path }}"
     delegate_to: localhost
