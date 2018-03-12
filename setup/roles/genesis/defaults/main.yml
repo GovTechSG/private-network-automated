@@ -1,0 +1,23 @@
+---
+# Use whatever is configured in `become_method` to perform privilege escalation in order to run
+# Docker containers
+# See https://docs.ansible.com/ansible/latest/become.html
+docker_become: yes
+# Name of the Proof of Authority Network
+network_name: "DemoPoA"
+# Reward for validating a block in Wei. Specify in hexadecimal
+block_reward: "0x4563918244F40000"
+# Duration, in seconds, between blocks minting
+step_duration: "5"
+# ID for the Ethereum Network in hexadecimal
+network_id: "0x4242"
+# Address of the master node
+master: "0x0"
+# Addresses of the initial set of validator nodes
+validators: []
+# Address of the OuterSet contract
+outer_set: "0x0000000000000000000000000000000000000005"
+# Address of the initial InnerSet contract
+inner_set: "0x0000000000000000000000000000000000000006"
+# Path to write the Geneis file to
+genesis_path: "{{ playbook_dir }}/genesis.json"

@@ -1,0 +1,42 @@
+---
+- name: Generate command
+  set_fact:
+    genesis_command: |
+      docker-compose \
+        -f {{ role_path }}/files/docker-compose.yml \
+        run --rm \
+        truffle \
+          yarn --silent generate:genesis --network docker_ci \
+          --name '{{ network_name }}' \
+          --blockReward '{{ block_reward }}' \
+          --stepDuration '{{ step_duration }}' \
+          --outer '{{ outer_set }}' \
+          --inner '{{ inner_set }}' \
+          --networkID '{{ network_id }}' \
+          --master '0x{{ master }}' \
+- name: Concatenate validators
+  set_fact:
+    genesis_command: "{{ genesis_command }} --validator '0x{{ item }}'"
+  with_items: "{{ validators }}"
+- name: Command to run
+  debug:
+    var: genesis_command
+    verbosity: 3
+- name: Generate Genesis file
+  shell: "{{ genesis_command }}"
+  become: "{{ docker_become }}"
+  register: docker
+- name: Write genesis file
+  copy:
+    dest: "{{ genesis_path }}"
+    content: "{{ docker.stdout }}"
+- name: Remove noise from truffle
+  lineinfile:
+    path: "{{ genesis_path }}"
+    regexp: "^Using network"
+    state: absent
+- name: Remove empty lines
+  lineinfile:
+    path: "{{ genesis_path }}"
+    regexp: "^$"
+    state: absent

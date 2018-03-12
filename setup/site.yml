@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Install pre-requisites
+  hosts: all
   tags:
     - bootstrap
   vars:
@@ -13,21 +14,55 @@
   - name: Install Docker
     include_role:
       name: ansible-docker-ubuntu
-- hosts:
+
+####################################################################################################
+- name: Bootstrap validators
+  hosts:
     - master
     - validators
   tags:
     - bootstrap
-    - generate_keys
   vars:
     # Overwrite exsiting keys or not
-    overwrite: true
+    overwrite: false
     # Path to write keys to
-    path: "{{ playbook_dir }}/keys"
+    key_path: "{{ playbook_dir }}/keys"
+    # Path to write Parity settings files to
+    parity_path: "{{ playbook_dir }}/parity"
   tasks:
   - name: Generate keys
     include_role:
       name: geth-key
     vars:
       account: "{{ inventory_hostname }}"
+      path: "{{ key_path }}"
     delegate_to: localhost
+    tags:
+      - generate_keys
+  - name: Generate genesis file
+    run_once: true
+    delegate_to: localhost
+    tags:
+      - genesis
+    block:
+      - name: List of master and validators
+        debug:
+          var: ansible_play_hosts
+      - name: Prepare empty keys array
+        set_fact:
+          keys: {}
+      - name: Read account keys
+        set_fact:
+          keys: "{{ keys | combine({ item: lookup(\"file\", \"{{ key_path }}/{{ item }}.json\") | from_json }) }}"
+        with_items: '{{ ansible_play_hosts }}'
+      - name: Print out parsed keys
+        debug:
+          var: keys
+          verbosity: 1
+      - name: Create Genesis Block
+        include_role:
+          name: genesis
+        vars:
+          master: "{{ keys.master.address }}"
+          validators: "{{ keys | json_query('*.address') }}"
+          genesis_path: "{{ parity_path }}/genesis.json"

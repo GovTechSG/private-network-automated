@@ -4,6 +4,8 @@
 
 - [Ansible](https://docs.ansible.com/ansible/latest/intro_installation.html)
 - [Geth](https://github.com/ethereum/go-ethereum/wiki/geth)
+- [Docker](https://docs.docker.com/install/)
+- [Docker Compose](https://github.com/docker/compose/releases)
 
 ## Pre-requisites
 
@@ -47,3 +49,16 @@ ansible-playbook \
     -i ../provision/terraform/inventory-private  \
     site.yml
 ```
+
+If you are connecting to your machines for the first time, you might see a prompt about trusting
+the host keys on the remote machine. To bypass this, you can add `ANSIBLE_HOST_KEY_CHECKING=False`
+before executing the playbook. Subsequent runs will not require this override.
+
+## Tags
+
+You can use [tags](https://docs.ansible.com/ansible/latest/playbooks_tags.html) to skip tasks or
+to only execute tasks. This section will describe the various tags present in the playbook.
+
+- `bootstrap`: Setup all the neccessary software and bootstrap the initial network, including creating the various keys for the master and validator nodes, the genesis block file and the initial Parity configuration. Within the bootstrap step, there are additional tags that you can use to skip steps.
+- `generate_keys`: Key generation is tagged to this. You can use this to skip key generation if you already have the keys.
+- `genesis`: Genesis generation is tied to this. You can skip this tag to avoid Geneis block generation if you already have the file.

@@ -1,0 +1,11 @@
+version: "2.3"
+services:
+  ganache:
+    image: trufflesuite/ganache-cli:latest
+    command: ganache-cli -h 0.0.0.0 -p 8545 -i 1337
+  truffle:
+    # Docker image with the yarn package containing the validator contracts built from
+    # https://github.com/GovTechSG/private-network/blob/master/contracts/validator/Dockerfile
+    image: govtechsg/private-network:latest
+    depends_on:
+      - ganache
