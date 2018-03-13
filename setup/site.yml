@@ -75,3 +75,67 @@
     delegate_to: localhost
     tags:
     - generate_enode
+  - name: Generate configuration file
+    run_once: true
+    delegate_to: localhost
+    tags:
+      - configuration
+    block:
+      - name: Prepare empty network keys array
+        set_fact:
+          # network_private_keys: {}
+          network_public_keys: {}
+      - name: Read network keys
+        set_fact:
+          # network_private_keys: "{{ network_private_keys | combine({ item: lookup(\"file\", \"{{ key_path }}/{{ item }}.network\") }) }}"
+          network_public_keys: "{{ network_public_keys | combine({ item: lookup(\"file\", \"{{ key_path }}/{{ item }}.network.public\") }) }}"
+        with_items: '{{ ansible_play_hosts }}'
+      - name: Print out public keys
+        debug:
+          var: network_public_keys
+          verbosity: 1
+      - name: Write out template
+        template:
+          dest: "{{ parity_path }}/authority.toml"
+          src: "{{ parity_path }}/authority.template.toml"
+
+####################################################################################################
+- name: Bootstrap Observers
+  hosts:
+    - observers
+  tags:
+    - bootstrap
+  vars:
+    # Path to write keys to
+    key_path: "{{ playbook_dir }}/keys"
+    # Path to write Parity settings files to
+    parity_path: "{{ playbook_dir }}/parity"
+    # List of all validators
+    all_validators: '{{ groups["validators"] | union(["master"]) }}'
+  tasks:
+  - name: Generate configuration file
+    run_once: true
+    delegate_to: localhost
+    tags:
+      - configuration
+    block:
+      - name: List of master and validators
+        debug:
+          var: all_validators
+      - name: Prepare empty network keys array
+        set_fact:
+          # network_private_keys: {}
+          network_public_keys: {}
+      - name: Read network keys
+        set_fact:
+          # network_private_keys: "{{ network_private_keys | combine({ item: lookup(\"file\", \"{{ key_path }}/{{ item }}.network\") }) }}"
+          network_public_keys: "{{ network_public_keys | combine({ item: lookup(\"file\", \"{{ key_path }}/{{ item }}.network.public\") }) }}"
+        with_items: "{{ all_validators }}"
+      - name: Print out public keys
+        debug:
+          var: network_public_keys
+          verbosity: 1
+      - name: Write out template
+        template:
+          dest: "{{ parity_path }}/observer.toml"
+          src: "{{ parity_path }}/observer.template.toml"

@@ -63,6 +63,7 @@ to only execute tasks. This section will describe the various tags present in th
 - `generate_keys`: Ethereum Key generation is tagged to this. You can use this to skip key generation if you already have the keys.
 - `genesis`: Genesis generation is tied to this. You can skip this tag to avoid Geneis block generation if you already have the file.
 - `generate_enode`: Node keys is tagged to this. You can use this to skip key generation if you already have the keys.
+- `configuration`: Configuration is tagged to this. This can be skipped.
 
 ## About enode ID
 

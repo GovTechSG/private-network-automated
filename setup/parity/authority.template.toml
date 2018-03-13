@@ -1,0 +1,25 @@
+[parity]
+base_path = "/data"
+db_path = "/chain"
+keys_path = "/config/keys"
+chain = "/config/chain.json"
+
+[account]
+password = ["/config/password"]
+
+[network]
+bootnodes = [
+{% for host in ansible_play_hosts %}
+    "enode://{{ network_public_keys[host] }}@{{ hostvars[host]['ansible_default_ipv4']['address'] }}:30303",
+{% endfor %}
+]
+
+[rpc]
+interface = "0.0.0.0"
+apis = ["web3", "eth", "net", "personal", "parity", "parity_set", "traces", "rpc", "parity_accounts"]
+
+[mining]
+force_sealing = true
+reseal_on_txs = "all"
+refuse_service_transactions = false
+usd_per_tx = "0"

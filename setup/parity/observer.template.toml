@@ -1,0 +1,17 @@
+
+[parity]
+base_path = "/data"
+db_path = "/chain"
+keys_path = "/config/keys"
+chain = "/config/chain.json"
+
+[network]
+bootnodes = [
+{% for host in all_validators %}
+    "enode://{{ network_public_keys[host] }}@{{ hostvars[host]['ansible_default_ipv4']['address'] }}:30303",
+{% endfor %}
+]
+
+[rpc]
+interface = "0.0.0.0"
+apis = ["web3", "eth", "net", "personal", "parity", "parity_set", "traces", "rpc", "parity_accounts"]

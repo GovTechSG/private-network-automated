@@ -30,3 +30,10 @@
       | tail -c 64\
       | xxd -p -c 64 \
       > '{{ network_base }}'.public
+- name: Chmod private keys
+  file:
+    mode: 0600
+    path: "{{ item }}"
+  with_items:
+    - "{{ network_base }}"
+    - "{{ network_base }}.pem"
