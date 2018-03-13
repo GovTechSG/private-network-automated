@@ -1,0 +1,32 @@
+---
+- name: Set up paths
+  set_fact:
+    network_base: "{{ path }}/{{ account }}.network"
+- name: Check if files exist
+  stat:
+    path: "{{ item }}"
+  with_items:
+    - "{{ network_base }}"
+    - "{{ network_base }}.pem"
+    - "{{ network_base }}.public"
+  register: exists
+- name: Refuse to overwrite
+  fail:
+    msg: "{{ item.item }} exists -- not overwriting"
+  when: item.stat.exists and not overwrite
+  with_items: "{{ exists.results }}"
+- name: Generate private key in PEM
+  shell: "openssl ecparam -name secp256k1 -genkey -noout -out '{{ network_base }}.pem'"
+- name: Convert private key to hexadecimal
+  shell: |
+    openssl ec -in '{{ network_base }}.pem' -outform DER \
+      | tail -c +8 \
+      | head -c 32 \
+      | xxd -p -c 32 \
+      > '{{ network_base }}'
+- name: Derive public key in hexadecimal
+  shell: |
+    openssl ec -in '{{ network_base }}.pem' -pubout -outform DER\
+      | tail -c 64\
+      | xxd -p -c 64 \
+      > '{{ network_base }}'.public

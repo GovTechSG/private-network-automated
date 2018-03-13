@@ -30,7 +30,7 @@
     # Path to write Parity settings files to
     parity_path: "{{ playbook_dir }}/parity"
   tasks:
-  - name: Generate keys
+  - name: Generate ethereum keys
     include_role:
       name: geth-key
     vars:
@@ -66,3 +66,12 @@
           master: "{{ keys.master.address }}"
           validators: "{{ keys | json_query('*.address') }}"
           genesis_path: "{{ parity_path }}/genesis.json"
+  - name: Generate enode keys
+    include_role:
+      name: enode-key
+    vars:
+      account: "{{ inventory_hostname }}"
+      path: "{{ key_path }}"
+    delegate_to: localhost
+    tags:
+    - generate_enode

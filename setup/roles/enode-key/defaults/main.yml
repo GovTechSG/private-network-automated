@@ -1,0 +1,7 @@
+---
+# Name of account to generate
+account: account
+# Path to directory to generate the keys
+path: "{{ playbook_dir }}/keys"
+# Whether to overwrite existing files
+overwrite: false
