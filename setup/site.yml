@@ -3,6 +3,7 @@
   hosts: all
   tags:
     - bootstrap
+    - install
   vars:
     docker_version: "18.02.0~ce-0~ubuntu"
   tasks:
@@ -10,6 +11,11 @@
     apt:
       upgrade: yes
       update_cache: yes
+    become: yes
+  - name: Install Pip
+    apt:
+      name: python3-pip
+      state: present
     become: yes
   - name: Install Docker
     include_role:
@@ -29,6 +35,8 @@
     key_path: "{{ playbook_dir }}/keys"
     # Path to write Parity settings files to
     parity_path: "{{ playbook_dir }}/parity"
+    # Name of PoA network
+    network_name: "DemoPoA"
   tasks:
   - name: Generate ethereum keys
     include_role:
@@ -98,6 +106,31 @@
         template:
           dest: "{{ parity_path }}/authority.toml"
           src: "{{ parity_path }}/authority.template.toml"
+  - name: Run the containers
+    tags:
+      - run
+    block:
+    - name: Create empty dictionaries
+      set_fact:
+        keys: {}
+        network_private_keys: {}
+    - name: Read keys
+      set_fact:
+        keys: "{{ keys | combine({ item: lookup(\"file\", \"{{ key_path }}/{{ item }}.json\") | from_json }) }}"
+        network_private_keys: "{{ network_private_keys | combine({ item: lookup(\"file\", \"{{ key_path }}/{{ item }}.network\") }) }}"
+      with_items: '{{ ansible_play_hosts }}'
+    - name: Run
+      include_role:
+        name: run
+      vars:
+        minter_account: "{{ keys[inventory_hostname].address }}"
+        unlock_account: "{{ keys[inventory_hostname].address }}"
+        network_key: "{{ network_private_keys[inventory_hostname] }}"
+        initial_account: True
+        initial_account_key: "{{ lookup('file', '{{ key_path }}/{{ inventory_hostname }}.json') }}"
+        initial_account_password: "{{ lookup('file', '{{ key_path }}/{{ inventory_hostname }}.pwd') }}"
+        genesis_content: "{{ lookup('file', '{{ parity_path }}/genesis.json') }}"
+        config_content: "{{ lookup('file', '{{ parity_path }}/authority.toml') }}"
 
 ####################################################################################################
 - name: Bootstrap Observers
@@ -112,6 +145,8 @@
     parity_path: "{{ playbook_dir }}/parity"
     # List of all validators
     all_validators: '{{ groups["validators"] | union(["master"]) }}'
+    # Name of PoA network
+    network_name: "DemoPoA"
   tasks:
   - name: Generate configuration file
     run_once: true
@@ -139,3 +174,19 @@
         template:
           dest: "{{ parity_path }}/observer.toml"
           src: "{{ parity_path }}/observer.template.toml"
+  - name: Run the containers
+    tags:
+      - run
+    block:
+    - name: Run
+      include_role:
+        name: run
+      vars:
+        minter_account: ""
+        unlock_account: ""
+        network_key: ""
+        initial_account: False
+        initial_account_key: ""
+        initial_account_password: ""
+        genesis_content: "{{ lookup('file', '{{ parity_path }}/genesis.json') }}"
+        config_content: "{{ lookup('file', '{{ parity_path }}/observer.toml') }}"

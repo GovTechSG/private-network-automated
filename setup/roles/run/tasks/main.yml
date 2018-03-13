@@ -1,0 +1,36 @@
+---
+- name: Create base directory
+  file:
+    path: "{{ base }}"
+    state: directory
+- name: Write Docker Compose files
+  template:
+    dest: "{{ base }}/docker-compose.yml"
+    src: "{{ role_path }}/files/docker-compose.yml"
+    mode: 0600
+- name: Write Genesis block
+  copy:
+    dest: "{{ volumes.chain.src_normalized }}"
+    content: "{{ genesis_content }}"
+- name: Write configuration file
+  copy:
+    dest: "{{ volumes.config.src_normalized }}"
+    content: "{{ config_content }}"
+- name: Write initial account key
+  copy:
+    dest: "{{ volumes.key.src_normalized }}"
+    content: "{{ initial_account_key }}"
+    mode: 0600
+  when: initial_account
+- name: Write initial account password
+  copy:
+    dest: "{{ volumes.password.src_normalized }}"
+    content: "{{ initial_account_password }}"
+    mode: 0600
+  when: initial_account
+- name: Start the containers
+  docker_service:
+    project_src: "{{ base }}"
+    pull: yes
+    state: present
+  become: yes

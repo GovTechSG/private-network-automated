@@ -1,0 +1,38 @@
+version: "2.3"
+services:
+  parity:
+    image: "{{ parity_image }}"
+    volumes:
+      - {{ volumes.chain.src }}:{{ volumes.chain.dest }}:ro
+      - {{ volumes.config.src }}:{{ volumes.config.dest }}:ro
+{% if initial_account %}
+      - {{ volumes.key.src }}:{{ volumes.key.dest }}:ro
+      - {{ volumes.password.src }}:{{ volumes.password.dest }}:ro
+{% endif %}
+      - chain:/chain
+      - base:/data
+    command:
+      - "--config"
+      - "{{ volumes.config.dest }}"
+{% if minter_account %}
+      - "--engine-signer"
+      - "{{ minter_account }}"
+{% endif %}
+{% if network_key %}
+      - "--node-key"
+      - "{{ network_key }}"
+{% endif %}
+{% if unlock_account %}
+      - "--unlock"
+      - "{{ unlock_account }}"
+{% endif %}
+    ports:
+      - 8180:8180
+      - 8545:8545
+      - 8546:8546
+      - 30303:30303
+    userns_mode: host
+    restart: always
+volumes:
+  chain: {}
+  base: {}

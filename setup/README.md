@@ -60,10 +60,12 @@ You can use [tags](https://docs.ansible.com/ansible/latest/playbooks_tags.html) 
 to only execute tasks. This section will describe the various tags present in the playbook.
 
 - `bootstrap`: Setup all the neccessary software and bootstrap the initial network, including creating the various keys for the master and validator nodes, the genesis block file and the initial Parity configuration. Within the bootstrap step, there are additional tags that you can use to skip steps.
+- `install`: Install pre-requisite software.
 - `generate_keys`: Ethereum Key generation is tagged to this. You can use this to skip key generation if you already have the keys.
 - `genesis`: Genesis generation is tied to this. You can skip this tag to avoid Geneis block generation if you already have the file.
 - `generate_enode`: Node keys is tagged to this. You can use this to skip key generation if you already have the keys.
 - `configuration`: Configuration is tagged to this. This can be skipped.
+- `run`: Create the Docker containers to run the clients.
 
 ## About enode ID
 

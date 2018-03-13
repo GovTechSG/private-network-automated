@@ -1,0 +1,41 @@
+---
+# Contents of the genesis file
+gensis_content: ""
+# Contents of the config file
+config_content: ""
+# Base directory to copy files to
+base: "~{{ ansible_user }}/parity"
+# Docker image of the parity client to use
+parity_image: "parity/parity:beta"
+# Name of the Proof of Authority Network
+network_name: "DemoPoA"
+# Account address to use to mint blocks
+minter_account: ""
+# Default account to unlock
+unlock_account: ""
+# Provide a forced network key
+network_key: ""
+# Set if an initial account is provided
+initial_account: False
+# Contents of the initial account key
+initial_account_key: ""
+# Contents of the initial account password
+initial_account_password: ""
+# Various volume paths. You generally should not need to touch this
+volumes:
+  chain:
+    src: "./genesis.json"
+    src_normalized: "{{ base }}/genesis.json"
+    dest: "/config/chain.json"
+  config:
+    src: "./config.toml"
+    src_normalized: "{{ base }}/config.toml"
+    dest: "/config/config.toml"
+  key:
+    src: "./key.json"
+    src_normalized: "{{ base }}/key.json"
+    dest: "/config/keys/{{ network_name }}/key.json"
+  password:
+    src: "./key.pwd"
+    src_normalized: "{{ base }}/key.pwd"
+    dest: "/config/password"
