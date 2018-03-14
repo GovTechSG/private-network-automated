@@ -147,7 +147,7 @@ data "template_file" "inventory_public" {
 
 resource "local_file" "inventory_public" {
     content     = "${data.template_file.inventory_public.rendered}"
-    filename = "${path.module}/inventory-public"
+    filename = "${path.module}/inventory/${terraform.env}/inventory-public"
 }
 
 data "template_file" "inventory_private" {
@@ -163,5 +163,5 @@ data "template_file" "inventory_private" {
 
 resource "local_file" "inventory_private" {
     content     = "${data.template_file.inventory_private.rendered}"
-    filename = "${path.module}/inventory-private"
+    filename = "${path.module}/inventory/${terraform.env}/inventory-private"
 }

@@ -1,4 +1,2 @@
 backend.tf
 *.tfvars
-inventory-public
-inventory-private

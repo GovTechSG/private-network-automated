@@ -83,5 +83,8 @@ terraform apply --var-file vars.tfvars
 ### Outputs
 
 The terraform application process will create two Ansible inventory files consisting of the public
-and private IPs of the instances accordingly. You can then use the generated inventory file
-to setup your instances.
+and private IPs of the instances accordingly. They can be found in `inventory/workspace` where
+`workspace` is the Terraform [Workspace](https://www.terraform.io/docs/state/workspaces.html)
+you are using.
+
+You can then use the generated inventory file to setup your instances.
