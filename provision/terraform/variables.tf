@@ -68,6 +68,11 @@ variable "ethereum_udp_ports" {
     default = [30303]
 }
 
+variable "enable_master_node" {
+    description = "Enable the deployment of a master node, or not"
+    default = true
+}
+
 variable "num_validator_nodes" {
     description = "Number of validator nodes to provision initially"
     default = 2

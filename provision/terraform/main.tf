@@ -3,6 +3,8 @@ provider "aws" {
 }
 
 resource "aws_instance" "master" {
+    count = "${var.enable_master_node ? 1 : 0}"
+
     ami = "${data.aws_ami.ubuntu.id}"
     instance_type = "${var.ec2_instance_type}"
     key_name = "${var.ec2_keypair}"
@@ -68,6 +70,8 @@ resource "aws_instance" "observers" {
 #######################################################
 
 resource "aws_security_group" "master" {
+    count = "${var.enable_master_node ? 1 : 0}"
+
     name = "${var.name_prefix}-master"
     description = "Parity PoA Network Master"
     vpc_id = "${var.vpc_id}"
@@ -135,13 +139,9 @@ data "template_file" "inventory_public" {
   template = "${file("${path.module}/templates/inventory")}"
 
   vars {
-    master_ip = "${aws_instance.master.public_ip}"
+    master = "${var.enable_master_node ? "master ansible_host=${aws_instance.master.public_ip}" : ""}"
     validators = "${join("\n", formatlist("validator-%s ansible_host=%s", aws_instance.validators.*.id, aws_instance.validators.*.public_ip))}"
     observers = "${join("\n", formatlist("observer-%s ansible_host=%s", aws_instance.observers.*.id, aws_instance.observers.*.public_ip))}"
-    // validators_id = "${join("\n", aws_instance.validators.*.id)}"
-    // validators_ip = "${join("\n", aws_instance.validators.*.public_ip)}"
-    // observers_id = "${join("\n", aws_instance.observers.*.id)}"
-    // observers_ip = "${join("\n", aws_instance.observers.*.public_ip)}"
   }
 }
 
@@ -154,7 +154,7 @@ data "template_file" "inventory_private" {
   template = "${file("${path.module}/templates/inventory")}"
 
   vars {
-    master_ip = "${aws_instance.master.private_ip}"
+    master = "${var.enable_master_node ? "master ansible_host=${aws_instance.master.private_ip}" : ""}"
     validators = "${join("\n", formatlist("validator-%s ansible_host=%s", aws_instance.validators.*.id, aws_instance.validators.*.private_ip))}"
     observers = "${join("\n", formatlist("observer-%s ansible_host=%s", aws_instance.observers.*.id, aws_instance.observers.*.private_ip))}"
 

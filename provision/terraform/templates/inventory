@@ -1,4 +1,4 @@
-master ansible_host=${master_ip}
+${master}
 
 [validators]
 ${validators}
