@@ -39,3 +39,14 @@ See the [README](provision/terraform/README.md) for more information.
 ## Setup
 
 See the [README](setup/README.md) for more information.
+
+
+## Post-setup
+
+After you have setup the network, you can perform tasks including:
+
+- Adding a validator node
+- Upgrading the validator contract
+
+You can see more information and instructions
+[here](https://github.com/GovTechSG/private-network#post-setup-tasks).
