@@ -21,6 +21,8 @@ initial_account: False
 initial_account_key: ""
 # Contents of the initial account password
 initial_account_password: ""
+# Remove all existing containters and volumes when re-running
+remove_previous: true
 # Various volume paths. You generally should not need to touch this
 volumes:
   chain:

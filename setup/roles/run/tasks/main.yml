@@ -28,6 +28,13 @@
     content: "{{ initial_account_password }}"
     mode: 0600
   when: initial_account
+- name: Remove previous containers
+  docker_service:
+    project_src: "{{ base }}"
+    remove_volumes: yes
+    state: absent
+  when: remove_previous
+  become: yes
 - name: Start the containers
   docker_service:
     project_src: "{{ base }}"
