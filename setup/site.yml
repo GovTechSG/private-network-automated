@@ -20,6 +20,16 @@
   - name: Install Docker
     include_role:
       name: ansible-docker-ubuntu
+  - name: Install Network time service
+    block:
+      - name: Disable timedatectl
+        shell: timedatectl set-ntp no
+        become: yes
+      - name: Install ntp
+        apt:
+          name: ntp
+          state: present
+        become: yes
 
 ####################################################################################################
 - name: Bootstrap validators

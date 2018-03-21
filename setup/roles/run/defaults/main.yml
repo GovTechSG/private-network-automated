@@ -6,7 +6,7 @@ config_content: ""
 # Base directory to copy files to
 base: "~{{ ansible_user }}/parity"
 # Docker image of the parity client to use
-parity_image: "parity/parity:beta"
+parity_image: "parity/parity:stable"
 # Name of the Proof of Authority Network
 network_name: "DemoPoA"
 # Account address to use to mint blocks
